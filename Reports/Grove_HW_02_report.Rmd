@@ -94,6 +94,110 @@ Lead is emitted from lead smelters and has the potential to be hazardous to chil
 Investigators examined the relationship between low-level lead exposure and high-level lead exposure on the IQ of children between the ages of 3 and 15 in El Paso. Investigators determined that subjects living within 1 mile of a lead smelter in the area would be considered as living "Near" the smelter, and subjects living outside of 1 mile of the smelter would be considered as living "Far" from the smelter. The IQ score of each subject was determined, and a summary of the data are presented below.
 
 
+### Discussion of Error in IQ Value
+
+```{r echo=FALSE}
+# Creating kbl() table of Distance_matrix. Inputs variable with changes to data.
+
+Distance_matrix %>%
+  kbl(caption= "Summary Statistics: IQ vs Distance",
+                  align="c") %>%
+  kable_classic_2(full_width= FALSE, lightable_options= "striped", 
+                  font_size= 20)
+```
+```{r echo=FALSE}
+# Boxplot of IQ values for Near and Far. If 999 outlier present, display
+#   boxplot with gap in y axis to better display non-outlier data. If 999
+#   outlier absent, display boxplot with standard scale.
+
+if(max(lead$IQ==999)){
+
+  gap.boxplot(Distance_list, gap=list(top=c(150,990), bottom=c(NA,NA)), 
+            names=c("Near","Far"), main="Distribution of IQ by Distance",
+            ylab="IQ")
+  
+  axis.break(axis=2, breakpos=151, style="zigzag")
+
+  } else {
+              
+    boxplot(Distance_list, main="Distribution of IQ by Distance", 
+            xlab=" Distance", ylab="IQ")}
+```
+
+It can be seen above that the range of the Far group is more than an order of magnitude greater than the Near group. Subject 10, a member of the Far group has an IQ listed as 999. This value was entered by mistake and subject 10 should have an IQ value of 99. The code
+
+```{r}
+
+lead[10,2]<-99
+```
+corrects this value to 99, reflecting the correct IQ score for subject 10. Some background calculations not presented in the report thus far will need to be re-run to provide the following summary and tables with the corrected data.
+
+
+```{r}
+################################################################################
+# Create submatrix according to "Near" or "Far"
+Near_list<-lead[which(lead$Smelter=="Near"),]
+Far_list<-lead[which(lead$Smelter=="Far"),]
+################################################################################
+
+################################################################################
+# Create vector of IQ column of "Far_list" and
+#   "Near_list", and combine that into new list "Distance_list
+#   so gap.boxplot will make a boxplot with a gap in the y-axis.
+
+Near_vect<-Near_list[,2]
+Far_vect<-Far_list[,2]
+Distance_list<-list(Near=Near_vect, Far=Far_vect)
+################################################################################
+
+################################################################################
+# Means, SD, Range of Near_list and Far_list IQ, rounded to
+#   2 decimal places
+Mean_Near_IQ<-round((mean(Near_list$IQ)),
+                    digits=2)
+Mean_Far_IQ<-round((mean(Far_list$IQ)),
+                    digits=2)
+
+SD_Near_IQ<-round((sd(Near_list$IQ)),
+                    digits=2)
+SD_Far_IQ<-round((sd(Far_list$IQ)),
+                    digits=2)
+
+Range_Near_IQ<- max(Near_list$IQ)-
+              min(Near_list$IQ)
+Range_Far_IQ<- max(Far_list$IQ)-
+              min(Far_list$IQ)
+################################################################################
+
+###############################################################################
+#Creating matrix of summary statistics to be used in kbl() function
+
+Distance_matrix<-matrix(rep(NA,8), nrow=2)
+
+colnames(Distance_matrix)<-c("n", "Mean IQ", "SD", "Range")
+
+rownames(Distance_matrix)<-c("Near", "Far")
+
+# Col 1 n
+Distance_matrix[1,1]<-length(Near_vect)
+Distance_matrix[2,1]<-length(Far_vect)
+
+# Col 2  mean
+Distance_matrix[1,2]<-round(mean(Near_vect), digits=2)
+Distance_matrix[2,2]<-round(mean(Far_vect), digits=2)
+
+# Col 3 sd
+Distance_matrix[1,3]<-round(sd(Near_vect), digits=2)
+Distance_matrix[2,3]<-round(sd(Far_vect), digits=2)
+
+# Col 4 range
+Distance_matrix[1,4]<-max(Near_vect)- min(Near_vect)
+Distance_matrix[2,4]<-max(Far_vect)- min(Far_vect)
+###############################################################################
+
+```
+
+
 ### Summary of Data
 
 ```{r}

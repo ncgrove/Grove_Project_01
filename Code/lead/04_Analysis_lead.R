@@ -1,4 +1,9 @@
-
+###############################################################################
+### file: 02_Exploratory
+### authors: Nathan Grove
+### creation date: 9/11/2020
+### description: Analysis of lead-iq.csv
+###############################################################################
 
 
 # Need: A. Graph(s) of IQ level by location status
